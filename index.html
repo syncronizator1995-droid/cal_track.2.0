@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#D4901F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Cal Track</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<main id="screens">
+
+  <!-- ================= TODAY ================= -->
+  <section class="screen is-active" id="screen-today">
+    <header class="appbar">
+      <div class="datenav">
+        <button class="iconbtn" id="prev-day" type="button" aria-label="Previous day">&lsaquo;</button>
+        <button class="datebtn" id="date-label" type="button">Today</button>
+        <button class="iconbtn" id="next-day" type="button" aria-label="Next day">&rsaquo;</button>
+      </div>
+      <button class="iconbtn" data-goto="settings" type="button" aria-label="Settings">&#9881;</button>
+    </header>
+
+    <div class="scroll">
+      <div class="card summary">
+        <div class="ringrow">
+          <div class="ringwrap">
+            <svg viewBox="0 0 120 120" width="112" height="112" aria-hidden="true">
+              <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+              <circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="52"></circle>
+            </svg>
+            <div class="ringtext">
+              <div class="ringnum" id="kcal-left">0</div>
+              <div class="ringlabel" id="kcal-left-label">kcal left</div>
+            </div>
+          </div>
+
+          <div class="macros">
+            <div class="macro">
+              <div class="macro-top">
+                <span class="macro-name">Protein</span>
+                <span class="macro-val"><b id="p-eaten">0</b> / <span id="p-goal">0</span> g</span>
+              </div>
+              <div class="track"><div class="fill fill-p" id="p-bar"></div></div>
+            </div>
+            <div class="macro">
+              <div class="macro-top">
+                <span class="macro-name">Carbs</span>
+                <span class="macro-val"><b id="c-eaten">0</b> / <span id="c-goal">0</span> g</span>
+              </div>
+              <div class="track"><div class="fill fill-c" id="c-bar"></div></div>
+            </div>
+            <div class="macro">
+              <div class="macro-top">
+                <span class="macro-name">Fat</span>
+                <span class="macro-val"><b id="f-eaten">0</b> / <span id="f-goal">0</span> g</span>
+              </div>
+              <div class="track"><div class="fill fill-f" id="f-bar"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="goalline">
+          <span>Eaten <b id="kcal-eaten">0</b></span>
+          <span>Goal <b id="kcal-goal">2200</b></span>
+        </div>
+      </div>
+
+      <!-- meal sections are built by script.js -->
+      <div id="meals"></div>
+    </div>
+  </section>
+
+  <!-- ================= FOODS ================= -->
+  <section class="screen" id="screen-foods">
+    <header class="appbar">
+      <h1 class="title">My foods</h1>
+      <button class="textbtn" id="new-food" type="button">+ New</button>
+    </header>
+    <div class="scroll">
+      <input class="search" id="food-search" type="search" placeholder="Search foods" autocomplete="off">
+      <div class="list" id="food-list"></div>
+      <p class="hint-text" id="food-count"></p>
+    </div>
+  </section>
+
+  <!-- ================= STATS ================= -->
+  <section class="screen" id="screen-stats">
+    <header class="appbar">
+      <h1 class="title">Stats</h1>
+    </header>
+    <div class="scroll">
+      <div class="card">
+        <div class="cardhead">
+          <span class="cardname">Calories</span>
+          <span class="cardnote" id="week-avg">&nbsp;</span>
+        </div>
+        <div class="chart" id="week-chart"></div>
+        <div class="days" id="week-days"></div>
+      </div>
+
+      <div class="card">
+        <div class="cardhead">
+          <span class="cardname">Weight</span>
+          <span class="cardnote" id="weight-delta">&nbsp;</span>
+        </div>
+        <div class="wrow">
+          <div class="wbig"><span id="weight-latest">--</span> <span class="wunit">kg</span></div>
+        </div>
+        <svg id="weight-chart" viewBox="0 0 240 60" width="100%" height="60"
+             preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="weightform">
+          <input class="input" id="weight-input" type="number" step="0.1" min="20" max="400"
+                 inputmode="decimal" placeholder="81.6">
+          <button class="btn btn-quiet" id="weight-save" type="button">Log weight</button>
+        </div>
+        <p class="hint-text" id="weight-for">&nbsp;</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SETTINGS ================= -->
+  <section class="screen" id="screen-settings">
+    <header class="appbar">
+      <button class="iconbtn" data-goto="today" type="button" aria-label="Back">&lsaquo;</button>
+      <h1 class="title">Settings</h1>
+      <span class="iconbtn is-hidden">&nbsp;</span>
+    </header>
+    <div class="scroll">
+      <div class="card">
+        <div class="cardhead"><span class="cardname">Daily goals</span></div>
+        <div class="field">
+          <label class="flabel" for="goal-kcal">Calories</label>
+          <input class="input" id="goal-kcal" type="number" inputmode="numeric" min="0" max="20000">
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label class="flabel" for="goal-p">Protein (g)</label>
+            <input class="input" id="goal-p" type="number" inputmode="numeric" min="0" max="1000">
+          </div>
+          <div class="field">
+            <label class="flabel" for="goal-c">Carbs (g)</label>
+            <input class="input" id="goal-c" type="number" inputmode="numeric" min="0" max="1000">
+          </div>
+          <div class="field">
+            <label class="flabel" for="goal-f">Fat (g)</label>
+            <input class="input" id="goal-f" type="number" inputmode="numeric" min="0" max="1000">
+          </div>
+          <div class="field">
+            <label class="flabel" for="goal-unit">Weight unit</label>
+            <select class="input" id="goal-unit">
+              <option value="kg">kg</option>
+              <option value="lb">lb</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn" id="goals-save" type="button">Save goals</button>
+      </div>
+
+      <div class="card">
+        <div class="cardhead"><span class="cardname">Your data</span></div>
+        <p class="hint-text">
+          Everything is stored on this device only. Nothing is uploaded, and no one else can see it.
+          Clearing your browser data will erase it &mdash; so export a backup now and then.
+        </p>
+        <div class="btnrow">
+          <button class="btn btn-quiet" id="export-btn" type="button">Export backup</button>
+          <button class="btn btn-quiet" id="import-btn" type="button">Import backup</button>
+        </div>
+        <input type="file" id="import-file" accept="application/json,.json" hidden>
+        <button class="btn btn-danger" id="reset-btn" type="button">Erase everything</button>
+      </div>
+
+      <p class="hint-text credit">
+        Food lookups come from <strong>Open Food Facts</strong>, a free open database.
+        Anything it doesn&rsquo;t know, you add once and this app remembers forever.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= TAB BAR ================= -->
+<nav class="tabbar">
+  <button class="tab is-on" data-goto="today" type="button"><span class="ic">&#9683;</span>Today</button>
+  <button class="tab" data-goto="foods" type="button"><span class="ic">&#9776;</span>Foods</button>
+  <button class="fab" id="scan-btn" type="button" aria-label="Scan a barcode">&#9635;</button>
+  <button class="tab" data-goto="stats" type="button"><span class="ic">&#9707;</span>Stats</button>
+  <span class="tab tab-ghost" aria-hidden="true"></span>
+</nav>
+
+<!-- ================= SCANNER ================= -->
+<div class="overlay overlay-dark" id="scan-overlay" hidden>
+  <div class="scanhead">
+    <button class="iconbtn iconbtn-light" id="scan-close" type="button" aria-label="Close scanner">&times;</button>
+    <span class="scantitle">Scan a barcode</span>
+    <span class="iconbtn is-hidden">&nbsp;</span>
+  </div>
+  <div class="viewfinder">
+    <video id="scan-video" playsinline muted autoplay></video>
+    <div class="brackets"><i></i><i></i><i></i><i></i></div>
+    <p class="scanhint" id="scan-hint">Point the camera at the barcode</p>
+  </div>
+  <div class="scanfoot">
+    <button class="btn btn-quiet btn-light" id="manual-btn" type="button">Type the barcode instead</button>
+  </div>
+</div>
+
+<!-- ================= PORTION SHEET ================= -->
+<div class="overlay" id="portion-overlay" hidden>
+  <div class="sheet">
+    <button class="grabber" id="portion-close" type="button" aria-label="Close"></button>
+    <span class="chip" id="portion-source">Saved food</span>
+    <h2 class="sheet-title" id="portion-name">Food</h2>
+    <p class="per100" id="portion-per100"></p>
+
+    <div class="field">
+      <span class="flabel">How much?</span>
+      <div class="stepper">
+        <button class="stepbtn" id="grams-minus" type="button" aria-label="Less">&minus;</button>
+        <input class="stepval" id="grams-input" type="number" inputmode="numeric" min="1" max="5000" value="100">
+        <span class="stepunit">g</span>
+        <button class="stepbtn" id="grams-plus" type="button" aria-label="More">+</button>
+      </div>
+      <div class="quickchips" id="grams-chips">
+        <button class="qc" data-grams="50" type="button">50 g</button>
+        <button class="qc" data-grams="100" type="button">100 g</button>
+        <button class="qc" data-grams="150" type="button">150 g</button>
+        <button class="qc" data-grams="200" type="button">200 g</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="flabel">Meal</span>
+      <div class="quickchips" id="meal-chips">
+        <button class="qc" data-meal="Breakfast" type="button">Breakfast</button>
+        <button class="qc" data-meal="Lunch" type="button">Lunch</button>
+        <button class="qc" data-meal="Dinner" type="button">Dinner</button>
+        <button class="qc" data-meal="Snacks" type="button">Snacks</button>
+      </div>
+    </div>
+
+    <button class="btn btn-big" id="portion-add" type="button">
+      Add to today <span class="btn-k" id="portion-kcal">0 kcal</span>
+    </button>
+  </div>
+</div>
+
+<!-- ================= NEW / EDIT FOOD ================= -->
+<div class="overlay" id="form-overlay" hidden>
+  <div class="sheet">
+    <button class="grabber" id="form-close" type="button" aria-label="Close"></button>
+    <h2 class="sheet-title" id="form-title">New food</h2>
+
+    <p class="notice" id="form-notice" hidden>
+      <strong>Not in any database.</strong>
+      Copy the numbers off the packet once &mdash; this barcode is yours forever after.
+      <span class="barcode-chip" id="form-barcode"></span>
+    </p>
+
+    <div class="field">
+      <label class="flabel" for="form-name">Name</label>
+      <input class="input" id="form-name" type="text" maxlength="80" placeholder="Chicken breast">
+    </div>
+    <div class="field">
+      <label class="flabel" for="form-brand">Brand <span class="soft">&middot; optional</span></label>
+      <input class="input" id="form-brand" type="text" maxlength="60" placeholder="Maxima">
+    </div>
+
+    <span class="flabel">Per 100 g &mdash; straight off the packet</span>
+    <div class="grid2">
+      <div class="unitfield"><input class="input" id="form-kcal" type="number" inputmode="decimal" min="0" max="1000" placeholder="120"><span class="unit">kcal</span></div>
+      <div class="unitfield"><input class="input" id="form-p" type="number" inputmode="decimal" min="0" max="100" step="0.1" placeholder="23"><span class="unit">protein</span></div>
+      <div class="unitfield"><input class="input" id="form-c" type="number" inputmode="decimal" min="0" max="100" step="0.1" placeholder="0"><span class="unit">carbs</span></div>
+      <div class="unitfield"><input class="input" id="form-f" type="number" inputmode="decimal" min="0" max="100" step="0.1" placeholder="2.6"><span class="unit">fat</span></div>
+    </div>
+
+    <p class="formerror" id="form-error" hidden></p>
+
+    <button class="btn btn-big" id="form-save" type="button">Save food</button>
+    <button class="btn btn-quiet" id="form-delete" type="button" hidden>Delete this food</button>
+  </div>
+</div>
+
+<!-- toast messages -->
+<div class="toast" id="toast" hidden></div>
+
+<script src="./script.js"></script>
+</body>
+</html>
