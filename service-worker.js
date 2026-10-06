@@ -32,12 +32,14 @@ self.addEventListener('install', function (event) {
   );
 });
 
+// Delete only Cal Track's own old caches. Other apps on this github.io address (Grind Strat,
+// Campfire) share Cache Storage, and deleting everything else would wipe their offline copies.
 self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys()
       .then(function (names) {
         return Promise.all(names.map(function (name) {
-          if (name !== CACHE) return caches.delete(name);
+          if (name.startsWith('cal-track-') && name !== CACHE) return caches.delete(name);
         }));
       })
       .then(function () { return self.clients.claim(); })
